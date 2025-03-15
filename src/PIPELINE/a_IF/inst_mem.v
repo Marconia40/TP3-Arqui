@@ -1,21 +1,21 @@
     `timescale 1ns / 1ps
 
-    module instru_mem#(
-    parameter MEM_SIZE        = 8,                 // Specify RAM data width
-    parameter MEM_LARGE       = 256,               // Specify RAM depth (number of entries)
+    module inst_mem#(
     parameter ADDR_SIZE       = 8,
     parameter ADDR_RW         = 32,
+    parameter MEM_SIZE        = 8,                 // Specify RAM data width
+    parameter MEM_LARGE       = 256,               // Specify RAM depth (number of entries)
     parameter INST_SIZE       = 32
     ) 
     (
     input                       i_clock,
-    input                       i_enable,       // Debug Unit Control                            
-    input                       i_read_enable,  
-    input                       i_write_enable, // Debug Unit Control   
-    input  [MEM_SIZE-1:0]       i_write_data,   // Debug Unit Control
-    input  [ADDR_SIZE-1:0]      i_write_addr,   // Debug Unit Control
-    input  [ADDR_RW-1:0]        i_read_addr,    // Read addr bus, width determined from RAM_DEPTH
-    output [INST_SIZE-1:0]      o_read_data     // RAM output data
+    input                       i_enable,               // Debug Unit Control                            
+    input                       i_read_enable,          
+    input                       i_write_enable,         // Debug Unit Control   
+    input  [MEM_SIZE-1:0]       i_write_data,           // Debug Unit Control
+    input  [ADDR_SIZE-1:0]      i_write_addr,           // Debug Unit Control
+    input  [ADDR_RW-1:0]        i_read_addr,            // Read addr bus, width determined from RAM_DEPTH
+    output [INST_SIZE-1:0]      o_read_data             // RAM output data
     );
 
     reg [MEM_SIZE-1:0] BRAM [MEM_LARGE-1:0];

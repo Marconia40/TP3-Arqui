@@ -25,7 +25,7 @@
             
             output [PC_SIZE-1:0]        o_pc,                   // PC
             output [PC_SIZE-1:0]        o_next_pc,              // PC+4
-            output [INST_SIZE-1:0]      o_instr
+            output [INST_SIZE-1:0]      o_instr                 // Instruction read from memory
         );
         
         wire [PC_SIZE-1:0]            new_pc_value;
@@ -86,7 +86,7 @@
             .o_data(mux2_3_output)
         );            
         
-        instru_mem instru_mem
+        inst_mem inst_mem
         (
             .i_clock(i_clock),
             .i_enable(i_instrmem_en),

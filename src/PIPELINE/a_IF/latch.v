@@ -1,6 +1,6 @@
     `timescale 1ns / 1ps
 
-    module catch#(
+    module latch#(
             parameter SIZE = 32
         )
         (
