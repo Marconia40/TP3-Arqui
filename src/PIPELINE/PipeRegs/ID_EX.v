@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module ID_EX_reg#(
+module ID_EX#(
         parameter OPCODE_SIZE   = 6,
         parameter IMM_SIZE      = 32,
         parameter PC_SIZE       = 32,

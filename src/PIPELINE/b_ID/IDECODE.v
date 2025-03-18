@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 `include "parameters.vh"
-module DECODE#(
+module IDECODE#(
         parameter PC_CONSTANT           = 3,
         parameter INST_SIZE             = 32,
         parameter PC_SIZE               = 32,

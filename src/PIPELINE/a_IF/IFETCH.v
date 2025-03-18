@@ -64,7 +64,7 @@
         
         mux2 mux_1
         (
-            .i_Signal(i_branch),
+            .i_SEL(i_branch),
             .i_A(adder_result),     // PC+1
             .i_B(i_branch_addr),    // branch
             .o_data(mux2_1_output)
@@ -72,7 +72,7 @@
                     
         mux2 mux_2
         (
-            .i_Signal(i_jal),
+            .i_SEL(i_jal),
             .i_A(mux2_1_output),
             .i_B(i_jump_addr),
             .o_data(mux2_2_output)
@@ -80,7 +80,7 @@
 
         mux2 mux_3
         (
-            .i_Signal(i_jalr),
+            .i_SEL(i_jalr),
             .i_A(mux2_2_output),
             .i_B(i_last_reg),
             .o_data(mux2_3_output)
