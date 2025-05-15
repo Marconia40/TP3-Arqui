@@ -59,7 +59,7 @@
         (
             .i_clock(i_clock),
             .i_next_pc(adder_result),
-            .o_next_pc(o_adder_result)
+            .o_next_pc(o_next_pc)
         );
         
         mux2 mux_1
@@ -99,6 +99,6 @@
         );
         
         assign o_instr          = instruction;
-        assign o_next_pc        = new_pc_value;
+        assign o_pc        = new_pc_value;
         
     endmodule

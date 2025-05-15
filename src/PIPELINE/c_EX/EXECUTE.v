@@ -95,7 +95,7 @@ module EXECUTE#(
         .o_result(alu_result)
     );
 
-    alu_ctrl alu_ctrl
+    alu_ctr alu_ctr
     (
         .i_funct_code(funct_code), 
         .i_alu_op(i_alu_op),

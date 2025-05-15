@@ -95,12 +95,15 @@ module IDECODE#(
 
     expand expand
     (
-        .i_data(i_inst[15:0]),
+        .i_data(i_inst[4:0]),
         .o_data(o_immediate)
     );
     
-    sign_extend sign_extend(.i_data(i_inst[10:6]),
-                  .o_data(o_shamt));
+    sign_extend sign_extend
+    (
+        .i_data(i_inst[10:6]),
+        .o_data(o_shamt)
+    );
 
     jump_addr jump_addr
     (

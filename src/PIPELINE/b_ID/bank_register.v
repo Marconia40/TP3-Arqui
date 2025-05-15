@@ -6,25 +6,20 @@ module bank_register#(
         parameter   BANK_DEPTH  =   32 // 32 Registros diferentes
     )
     (
-        input               i_clock,
-        input               i_reset,
-        input               i_reg_write,    // Señal de control RegWrite proveniente de WB
-        input [ADDR_SIZE-1:0] i_read_reg_a,
-        input [ADDR_SIZE-1:0] i_read_reg_b,
-        input [ADDR_SIZE-1:0] i_write_reg,    // addr 
-        input [DATA_SIZE-1:0] i_write_data,   // Data
+        input                   i_clock,
+        input                   i_reset,
+        input                   i_reg_write,    // Señal de control RegWrite proveniente de WB
+        input [ADDR_SIZE-1:0]   i_read_reg_a,
+        input [ADDR_SIZE-1:0]   i_read_reg_b,
+        input [ADDR_SIZE-1:0]   i_write_reg,    // addr 
+        input [DATA_SIZE-1:0]   i_write_data,   // Data
 
-        input               i_enable,       // Debug Unit
-        input               i_read_enable,  // Debug Unit
-        input [ADDR_SIZE-1:0] i_read_addr,    // Debug Unit
+        input                   i_enable,       // Debug Unit
+        input                   i_read_enable,  // Debug Unit
+        input [ADDR_SIZE-1:0]   i_read_addr,    // Debug Unit
               
-        output [DATA_SIZE-1:0] o_data_a,
-        output [DATA_SIZE-1:0] o_data_b,
-
-        // Adicionales para inicialización explícita
-        input               i_init_enable,
-        input [ADDR_SIZE-1:0] i_init_addr,
-        input [DATA_SIZE-1:0] i_init_data
+        output [DATA_SIZE-1:0]  o_data_a,
+        output [DATA_SIZE-1:0]  o_data_b
     );
     
     reg [DATA_SIZE-1:0] o_data_a_next;
@@ -48,10 +43,7 @@ module bank_register#(
                 registers[reg_index] <= {DATA_SIZE{1'b0}};
         end 
         else begin
-            if (i_init_enable) begin // Inicialización explícita
-                registers[i_init_addr] <= i_init_data;
-            end
-            else if(i_enable) begin // Funcionamiento normal
+            if (i_enable) begin // Funcionamiento normal
                 // Escritura de regs
                 if (i_reg_write) begin
                     registers[i_write_reg] <= i_write_data;

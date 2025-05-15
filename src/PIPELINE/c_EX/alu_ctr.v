@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 `include "parameters.vh"
-module alu_ctrl#(
+module alu_ctr#(
         parameter   FUNC_CODE_SIZE          = 6,
         parameter   OPCODE_SIZE             = 6,
         parameter   ALU_CTRL_SIZE           = 4
