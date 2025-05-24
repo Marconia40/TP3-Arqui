@@ -48,7 +48,7 @@ module TOP#(
     wire                rb_enable;
     wire                rb_read_enable;
     wire [DWORD-1:0]    rb_data;
-    wire [READ_SIZE-1:0]  READ_SIZE;
+    wire [READ_SIZE-1:0]  rb_addr;
     wire                im_enable;
     wire                im_write_enable;
     wire [BYTE-1:0]     im_addr;
@@ -72,7 +72,7 @@ module TOP#(
         .i_bank_reg_data(rb_data),
         .o_instru_mem_data(im_data),
         .o_instru_mem_addr(im_addr),
-        .o_rb_addr(READ_SIZE),
+        .o_rb_addr(rb_addr),
         .o_mem_data_addr(mem_addr),
         .o_tx_data(uart_debug_unit_to_send),
         .o_tx_start(uart_debug_unit_tx_start),
@@ -119,7 +119,7 @@ module TOP#(
         .i_instru_mem_addr(im_addr),
         .i_bank_register_enable(rb_enable),
         .i_bank_register_read_enable(rb_read_enable),
-        .i_bank_register_addr(READ_SIZE),
+        .i_bank_register_addr(rb_addr),
         .i_mem_data_enable(mem_enable),
         .i_mem_data_read_enable(mem_read_enable),
         .i_mem_data_read_addr(mem_addr),

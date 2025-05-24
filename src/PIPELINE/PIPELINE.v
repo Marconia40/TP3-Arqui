@@ -1,5 +1,6 @@
 `timescale 1ns / 1ps
 `include "parameters.vh"
+
 module PIPELINE#(
         parameter PC_SIZE               = 32,
         parameter INSTRUCTION_SIZE      = 32,

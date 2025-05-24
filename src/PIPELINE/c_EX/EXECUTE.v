@@ -118,7 +118,7 @@ module EXECUTE#(
         .o_data(dataB_or_Inm)
     );
 
-    mux2 #(.NB(5)) mux2_RT_or_RD
+    mux2 #(.PC_SIZE(5)) mux2_RT_or_RD
     (
         .i_SEL(i_reg_dest),
         .i_A(i_rt),
@@ -126,7 +126,7 @@ module EXECUTE#(
         .o_data(RT_or_RD)
     );
 
-    mux2 #(.NB(5)) mux2_RT_RD_or_LAST_REG
+    mux2 #(.PC_SIZE(5)) mux2_RT_RD_or_LAST_REG
     (
         .i_SEL(last_register_ctrl),
         .i_A(RT_or_RD),
