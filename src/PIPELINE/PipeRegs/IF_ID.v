@@ -1,56 +1,55 @@
-    `timescale 1ns / 1ps
+`timescale 1ns / 1ps
 
-    module IF_ID#(
-            parameter PC_SIZE             = 32,
-            parameter INST_SIZE           = 32
-        )
-        (
-            input                       i_clock,
-            input                       i_reset,
-            input                       i_pipe_en,          // DEBUG UNIT
-            input                       i_enable,           // STALL UNIT: 1 -> data hazard (stall) 0 -> !data_hazard
-            input                       i_flush,            // STALL UNIT: 1 -> control hazards     0 -> !control_hazard
-            input  [INST_SIZE-1:0]      i_instr,          
-            input  [PC_SIZE-1:0]        i_next_pc,           
-   
-            output [PC_SIZE-1:0]        o_next_pc,
-            output [INST_SIZE-1:0]      o_instr
-        );
+module IF_ID#(
+        parameter PC_SIZE           = 32,
+        parameter INSTRUCTION_SIZE  = 32
+    )
+    (
+        input                       i_clock,
+        input                       i_reset,
+        input                       i_pipeline_enable,  // DEBUG UNIT
+        input                       i_enable,           // STALL UNIT: 1 -> data hazard (stall) 0 -> !data_hazard
+        input                       i_flush,            // STALL UNIT: 1 -> control hazards     0 -> !control_hazard
+        input [PC_SIZE-1:0]           i_adder_result,
+        input [INSTRUCTION_SIZE-1:0]  i_instruction,
+        
+        output [PC_SIZE-1:0]          o_adder_result,
+        output [INSTRUCTION_SIZE-1:0] o_instruction
+    );
+    
+    reg [PC_SIZE-1:0]             adder_result;
+    reg [INSTRUCTION_SIZE-1:0]    instruction;
 
-        reg [PC_SIZE-1:0]             next_pc_reg;
-        reg [INST_SIZE-1:0]           instr_reg;
-
-
-        always @(negedge i_clock) begin
-            if(i_reset)begin
-                next_pc_reg    <= {PC_SIZE{1'b0}};
-                instr_reg <= {INST_SIZE{1'b0}};
-            end
-            else begin
-                if(i_pipe_en) begin
-                    if(i_enable) begin
-                        if(i_flush) begin
-                            next_pc_reg     <= i_next_pc;
-                            instr_reg       <= {INST_SIZE{1'b0}};
-                        end
-                        else begin
-                            next_pc_reg     <= i_next_pc;
-                            instr_reg       <= i_instr;
-                        end
+    always @(negedge i_clock) begin
+        if(i_reset)begin
+            adder_result    <= {32{1'b0}};
+            instruction <= {32{1'b0}};
+        end
+        else begin
+            if(i_pipeline_enable) begin
+                if(i_enable) begin
+                    if(i_flush) begin
+                        adder_result    <= i_adder_result;
+                        instruction <= {32{1'b0}};
                     end
                     else begin
-                        next_pc_reg     <= next_pc_reg;
-                        instr_reg       <= instr_reg;
+                        adder_result    <= i_adder_result;
+                        instruction <= i_instruction;
                     end
                 end
                 else begin
-                    next_pc_reg      <= next_pc_reg;
-                    instr_reg        <= instr_reg;
+                    adder_result    <= adder_result;
+                    instruction <= instruction;
                 end
-            end    
-        end
+            end
+            else begin
+                adder_result    <= adder_result;
+                instruction <= instruction;
+            end
+        end    
+    end
 
-        assign o_next_pc        = next_pc_reg;
-        assign o_instr          = instr_reg;
+    assign o_adder_result      = adder_result;
+    assign o_instruction   = instruction;
         
-    endmodule
+endmodule

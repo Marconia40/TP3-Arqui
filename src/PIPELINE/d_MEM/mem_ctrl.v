@@ -2,13 +2,13 @@
 `include "parameters.vh"
 module mem_ctrl#(
     parameter DATA_SIZE = 32,
-    parameter TYPE = 3
+    parameter TYPE_SIZE = 3
 ) 
 (   
     input                   i_signed,
     input                   i_write,
     input                   i_read,
-    input  [TYPE-1:0]       i_word_size,
+    input  [TYPE_SIZE-1:0]    i_word_size,
 
     input  [DATA_SIZE-1:0]    i_write_data,
     input  [DATA_SIZE-1:0]    i_read_data,

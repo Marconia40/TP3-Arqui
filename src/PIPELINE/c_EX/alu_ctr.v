@@ -1,14 +1,14 @@
 `timescale 1ns / 1ps
 `include "parameters.vh"
 module alu_ctr#(
-        parameter   FUNC_CODE_SIZE          = 6,
-        parameter   OPCODE_SIZE             = 6,
-        parameter   ALU_CTRL_SIZE           = 4
+        parameter   FUNCTION_SIZE        = 6,
+        parameter   ALU_OP_SIZE       = 6,
+        parameter   ALU_CTRL_SIZE    = 4
         
     )
     (
-        input      [FUNC_CODE_SIZE-1     : 0] i_funct_code, // Codigo de funcion para instrucciones tipo R
-        input      [OPCODE_SIZE-1    : 0] i_alu_op,     // opcode
+        input      [FUNCTION_SIZE-1     : 0] i_funct_code, // Codigo de funcion para instrucciones tipo R
+        input      [ALU_OP_SIZE-1    : 0] i_alu_op,     // opcode
         output reg [ALU_CTRL_SIZE-1 : 0] o_alu_ctrl,   // Senial que indica a la ALU que tipo de operacion ejecutar
         output reg                      o_shamt_ctrl, // Senial de MUX: 0 -> shamt  1 -> data_a
         output reg                      o_last_register_ctrl    // Senial que selecciona registro last_register para que se guarde el PC

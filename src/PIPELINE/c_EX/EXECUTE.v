@@ -1,61 +1,61 @@
 `timescale 1ns / 1ps
 
 module EXECUTE#(
-        parameter OPCODE_SIZE       = 6,
+        parameter ALU_OP_SIZE       = 6,
         parameter ALU_CTRL_SIZE     = 4,
         parameter IMM_SIZE          = 32,
-        parameter PC_SIZE           = 32, // TODO: estaba en 6
+        parameter PC_SIZE           = 32,
         parameter DATA_SIZE         = 32,
         parameter REG_SIZE          = 5,
-        parameter FUNC_CODE_SIZE    = 6,
-        parameter MUX_SEL_SIZE      = 2
+        parameter FUNCTION_SIZE     = 6,
+        parameter SELECT_SIZE       = 2
     )
     (
-        input                           i_signed,
-        input                           i_reg_write,  // WB stage flag
-        input                           i_mem_to_reg, // WB stage flag
-        input                           i_mem_read,   // MEM stage flag
-        input                           i_mem_write,  // MEM stage flag
-        input                           i_branch,     // MEM stage flag
-        input                           i_alu_src,
-        input                           i_reg_dest,
-        input [OPCODE_SIZE-1:0]         i_alu_op,
-        input [PC_SIZE-1:0]             i_pc,
-        input [DATA_SIZE-1:0]           i_data_a,
-        input [DATA_SIZE-1:0]           i_data_b,
-        input [IMM_SIZE-1:0]            i_immediate,
-        input [DATA_SIZE-1:0]           i_shamt,
-        input [REG_SIZE-1:0]            i_rt,
-        input [REG_SIZE-1:0]            i_rd,
-        input                           i_byte_enable,
-        input                           i_halfword_enable,
-        input                           i_word_enable,
-        input                           i_halt,
-        input [DATA_SIZE-1:0]           i_mem_fwd_data,   // forwarding
-        input [DATA_SIZE-1:0]           i_wb_fwd_data,    // forwarding
-        input [MUX_SEL_SIZE-1:0]        i_fwd_a,          // FORWARDING UNIT
-        input [MUX_SEL_SIZE-1:0]        i_fwd_b,          // FORWARDING UNIT
-        input [MUX_SEL_SIZE-1:0]        i_forwarding_mux, // FORWARDING UNIT
-        input                           i_jump,
+        input                   i_signed,
+        input                   i_reg_write,  // WB stage flag
+        input                   i_mem_to_reg, // WB stage flag
+        input                   i_mem_read,   // MEM stage flag
+        input                   i_mem_write,  // MEM stage flag
+        input                   i_branch,     // MEM stage flag
+        input                   i_alu_src,
+        input                   i_reg_dest,
+        input [ALU_OP_SIZE-1:0]   i_alu_op,
+        input [PC_SIZE-1:0]       i_pc,
+        input [DATA_SIZE-1:0]     i_data_a,
+        input [DATA_SIZE-1:0]     i_data_b,
+        input [IMM_SIZE-1:0]      i_immediate,
+        input [DATA_SIZE-1:0]     i_shamt,
+        input [REG_SIZE-1:0]      i_rt,
+        input [REG_SIZE-1:0]      i_rd,
+        input                   i_byte_enable,
+        input                   i_halfword_enable,
+        input                   i_word_enable,
+        input                   i_halt,
+        input [DATA_SIZE-1:0]     i_mem_fwd_data,   // forwarding
+        input [DATA_SIZE-1:0]     i_wb_fwd_data,    // forwarding
+        input [SELECT_SIZE-1:0]      i_fwd_a,          // FORWARDING UNIT
+        input [SELECT_SIZE-1:0]      i_fwd_b,          // FORWARDING UNIT
+        input [SELECT_SIZE-1:0]      i_forwarding_mux, // FORWARDING UNIT
+        input                   i_jump,
         
-        output                          o_signed,
-        output                          o_reg_write,
-        output                          o_mem_to_reg,
-        output                          o_mem_read,
-        output                          o_mem_write,
-        output                          o_branch,
-        output [PC_SIZE-1:0]            o_branch_addr,
-        output                          o_zero,
-        output [DATA_SIZE-1:0]          o_alu_result,
-        output [DATA_SIZE-1:0]          o_data_b,
-        output [REG_SIZE-1:0]           o_selected_reg,
-        output                          o_byte_enable,
-        output                          o_halfword_enable,
-        output                          o_word_enable,
-        output                          o_last_register_ctrl,
-        output [PC_SIZE-1:0]            o_pc,
-        output                          o_halt,
-        output                          o_jump
+        output                  o_signed,
+        output                  o_reg_write,
+        output                  o_mem_to_reg,
+        output                  o_mem_read,
+        output                  o_mem_write,
+        output                  o_branch,
+        output [PC_SIZE-1:0]      o_branch_addr,
+        output                  o_zero,
+        output [DATA_SIZE-1:0]    o_alu_result,
+        output [DATA_SIZE-1:0]    o_data_b,
+        output [REG_SIZE-1:0]     o_selected_reg,
+        output                  o_byte_enable,
+        output                  o_halfword_enable,
+        output                  o_word_enable,
+        output                  o_last_register_ctrl,
+        output [PC_SIZE-1:0]      o_pc,
+        output                  o_halt,
+        output                  o_jump
     );
     
     wire [IMM_SIZE-1:0]       shifted_imm;
@@ -69,7 +69,7 @@ module EXECUTE#(
     wire [ALU_CTRL_SIZE-1:0]  alu_ctrl;
     wire [REG_SIZE-1:0]       RT_or_RD;
     wire [REG_SIZE-1:0]       selected_reg;
-    wire [FUNC_CODE_SIZE-1:0]     funct_code;
+    wire [FUNCTION_SIZE-1:0]     funct_code;
     wire [DATA_SIZE-1:0]      data_b;
     
     wire                    select_shamt;
@@ -77,7 +77,7 @@ module EXECUTE#(
 
     reg [REG_SIZE-1:0]        last_register = 5'd31;
     
-    assign funct_code = i_immediate [FUNC_CODE_SIZE-1:0];
+    assign funct_code = i_immediate [FUNCTION_SIZE-1:0];
     
     adder adder_2
     (
@@ -118,7 +118,7 @@ module EXECUTE#(
         .o_data(dataB_or_Inm)
     );
 
-    mux2 #(.SIZE(5)) mux2_RT_or_RD
+    mux2 #(.NB(5)) mux2_RT_or_RD
     (
         .i_SEL(i_reg_dest),
         .i_A(i_rt),
@@ -126,7 +126,7 @@ module EXECUTE#(
         .o_data(RT_or_RD)
     );
 
-    mux2 #(.SIZE(5)) mux2_RT_RD_or_LAST_REG
+    mux2 #(.NB(5)) mux2_RT_RD_or_LAST_REG
     (
         .i_SEL(last_register_ctrl),
         .i_A(RT_or_RD),

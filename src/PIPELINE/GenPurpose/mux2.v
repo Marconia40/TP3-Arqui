@@ -1,17 +1,17 @@
 `timescale 1ns / 1ps
 
 module mux2#(
-        parameter   SIZE = 32
+        parameter   PC_SIZE = 32
     )
     (
         input           i_SEL,
-        input  [SIZE-1:0] i_A,
-        input  [SIZE-1:0] i_B,
-        output [SIZE-1:0] o_data
+        input  [PC_SIZE-1:0] i_A,
+        input  [PC_SIZE-1:0] i_B,
+        output [PC_SIZE-1:0] o_data
     
     );
     
-    reg [SIZE-1:0] aux_reg;
+    reg [PC_SIZE-1:0] aux_reg;
     
     always @ (*) begin
         case (i_SEL)

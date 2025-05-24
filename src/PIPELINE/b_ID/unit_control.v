@@ -2,36 +2,36 @@
 `include "parameters.vh"
 
 module unit_control#(
-        parameter   OPCODE_SIZE       = 6,
-        parameter   FUNCT_SIZE        = 6
+        parameter   ALU_OP_SIZE       = 6,
+        parameter   FUNCTION_SIZE        = 6
     )
     (   input                       i_clock,
         input                       i_enable,
         input                       i_reset,        // Necesario para flush en controls hazard
-        input [OPCODE_SIZE-1:0]     i_opcode,
-        input [FUNCT_SIZE-1:0]      i_funct,
+        input [ALU_OP_SIZE-1:0]       i_opcode,
+        input [FUNCTION_SIZE-1:0]        i_funct,
         input                       i_flush_unit_ctrl,     // from STALL UNIT
         
-        output reg                      o_signed,
-        output reg                      o_reg_dest,     // EX
-        output reg [OPCODE_SIZE-1:0]    o_alu_op,       // EX REG?
-        output reg                      o_alu_src,      // EX
-        output reg                      o_mem_read,     // MEM
-        output reg                      o_mem_write,    // MEM
-        output reg                      o_branch,       // MEM
-        output reg                      o_reg_write,    // WB
-        output reg                      o_mem_to_reg,   // WB
-        output reg                      o_jump,
-        output reg                      o_byte_enable,
-        output reg                      o_halfword_enable,
-        output reg                      o_word_enable,
-        output reg                      o_jr_jalr,      // Hacia register bank
-        output reg                      o_halt           // END OF PROGRAM
+        output reg                  o_signed,
+        output reg                  o_reg_dest,     // EX
+        output reg [ALU_OP_SIZE-1:0]  o_alu_op,       // EX REG?
+        output reg                  o_alu_src,      // EX
+        output reg                  o_mem_read,     // MEM
+        output reg                  o_mem_write,    // MEM
+        output reg                  o_branch,       // MEM
+        output reg                  o_reg_write,    // WB
+        output reg                  o_mem_to_reg,   // WB
+        output reg                  o_jump,
+        output reg                  o_byte_enable,
+        output reg                  o_halfword_enable,
+        output reg                  o_word_enable,
+        output reg                  o_jr_jalr,      // Hacia register bank
+        output reg                  o_halt           // END OF PROGRAM
     );
 
     always@(posedge i_clock) begin
         if(i_reset) begin
-            o_alu_op            <= {OPCODE_SIZE{1'b0}};
+            o_alu_op            <= {ALU_OP_SIZE{1'b0}};
             o_signed            <= 1'b0;
             o_reg_dest          <= 1'b0;
             o_alu_src           <= 1'b0;

@@ -1,12 +1,11 @@
 `timescale 1ns / 1ps
 `include "parameters.vh"
 module IDECODE#(
-        parameter PC_CONSTANT           = 3,
-        parameter INST_SIZE             = 32,
+        parameter INSTRUCTION_SIZE      = 32,
         parameter PC_SIZE               = 32,
         parameter DATA_SIZE             = 32,
         parameter REG_SIZE              = 5, 
-        parameter OPCODE_SIZE           = 6
+        parameter ALU_OP_SIZE           = 6
     )
     (
         input                       i_clock,
@@ -15,17 +14,17 @@ module IDECODE#(
         input                       i_unit_control_enable,      // Debug Unit
         input                       i_rb_enable,                // Debug Unit
         input                       i_rb_read_enable,           // Debug Unit
-        input [REG_SIZE-1:0]        i_rb_read_addr,             // Debug Unit
-        input [INST_SIZE-1:0]       i_inst,
-        input [PC_SIZE-1:0]         i_pc,
-        input [DATA_SIZE-1:0]       i_write_data,               // from WB, data to write
-        input [REG_SIZE-1:0]        i_write_reg,                // from WB, addr to write
+        input [REG_SIZE-1:0]          i_rb_read_addr,             // Debug Unit
+        input [INSTRUCTION_SIZE-1:0]         i_inst,
+        input [PC_SIZE-1:0]           i_pc,
+        input [DATA_SIZE-1:0]         i_write_data,               // from WB, data to write
+        input [REG_SIZE-1:0]          i_write_reg,                // from WB, addr to write
         input                       i_reg_write,                // from unit_control, en write reg
         input                       i_flush_unit_ctrl,
         
         output                      o_signed,
         output                      o_reg_dest,                 // EX, signal
-        output [OPCODE_SIZE-1:0]    o_alu_op,                   // EX, signal
+        output [ALU_OP_SIZE-1:0]      o_alu_op,                   // EX, signal
         output                      o_alu_src,                  // EX, signal
         output                      o_mem_read,                 // MEM, signal
         output                      o_mem_write,                // MEM, signal
@@ -35,15 +34,15 @@ module IDECODE#(
         output                      o_jump,                     // DECODE, signal
         output                      o_halt,
         output                      o_jr_jalr,                  // FETCH
-        output [PC_SIZE-1:0]        o_jump_addr,  
-        output [DATA_SIZE-1:0]      o_data_a,
-        output [DATA_SIZE-1:0]      o_data_b,
-        output [PC_SIZE-1:0]        o_immediate,                // immediate 32b / function code
-        output [DATA_SIZE-1:0]      o_shamt,
-        output [REG_SIZE-1:0]       o_rt,
-        output [REG_SIZE-1:0]       o_rd,
-        output [REG_SIZE-1:0]       o_rs,
-        output [PC_SIZE-1:0]        o_pc,
+        output [PC_SIZE-1:0]          o_jump_addr,  
+        output [DATA_SIZE-1:0]        o_data_a,
+        output [DATA_SIZE-1:0]        o_data_b,
+        output [PC_SIZE-1:0]          o_immediate,                // immediate 32b / function code
+        output [DATA_SIZE-1:0]        o_shamt,
+        output [REG_SIZE-1:0]         o_rt,
+        output [REG_SIZE-1:0]         o_rd,
+        output [REG_SIZE-1:0]         o_rs,
+        output [PC_SIZE-1:0]          o_pc,
         output                      o_byte_enable,
         output                      o_halfword_enable,
         output                      o_word_enable
@@ -93,13 +92,13 @@ module IDECODE#(
         .o_halt(o_halt)
     );
 
-    expand expand
+    sign_extend sign_extend
     (
-        .i_data(i_inst[4:0]),
+        .i_data(i_inst[15:0]),
         .o_data(o_immediate)
     );
     
-    sign_extend sign_extend
+    expand expand
     (
         .i_data(i_inst[10:6]),
         .o_data(o_shamt)

@@ -1,14 +1,14 @@
 module select#(
-        parameter MEM_ADDR_SIZE   = 5,
+        parameter REG_SIZE   = 5,
         parameter DATA_SIZE       = 32
     )(
         input wire i_debug_unit_flag,
         input wire i_memory_data_read_enable,
-        input wire [MEM_ADDR_SIZE-1:0] i_memory_data_read_addr,
+        input wire [REG_SIZE-1:0] i_memory_data_read_addr,
         input wire i_mem_read,
         input wire i_mem_write,
-        input wire [MEM_ADDR_SIZE-1:0] i_alu_result,
-        output reg [MEM_ADDR_SIZE-1:0] o_addr,
+        input wire [REG_SIZE-1:0] i_alu_result,
+        output reg [REG_SIZE-1:0] o_addr,
         output reg o_mem_read,
         output reg o_mem_write
     );

@@ -3,9 +3,9 @@ module TOP#(
         parameter BYTE          = 8,
         parameter DWORD         = 32,
         parameter ADDR          = 5,
-        parameter MEM_DEPTH_SIZE  = 8,
-        parameter RB_ADDR_SIZE       = 5,
-        parameter STATE_SIZE      = 10
+        parameter MEM_SIZE      = 8,
+        parameter READ_SIZE       = 5,
+        parameter STATE_SIZE    = 10
     )
     (
         input                 i_clock,
@@ -48,7 +48,7 @@ module TOP#(
     wire                rb_enable;
     wire                rb_read_enable;
     wire [DWORD-1:0]    rb_data;
-    wire [RB_ADDR_SIZE-1:0]  rb_addr;
+    wire [READ_SIZE-1:0]  READ_SIZE;
     wire                im_enable;
     wire                im_write_enable;
     wire [BYTE-1:0]     im_addr;
@@ -72,7 +72,7 @@ module TOP#(
         .i_bank_reg_data(rb_data),
         .o_instru_mem_data(im_data),
         .o_instru_mem_addr(im_addr),
-        .o_rb_addr(rb_addr),
+        .o_rb_addr(READ_SIZE),
         .o_mem_data_addr(mem_addr),
         .o_tx_data(uart_debug_unit_to_send),
         .o_tx_start(uart_debug_unit_tx_start),
@@ -106,20 +106,20 @@ module TOP#(
     PIPELINE PIPELINE
     (
         .i_clock(clk_wiz), 
-        .i_pc_en(pc_enable),
+        .i_pc_enable(pc_enable),
         .i_pc_reset(i_reset),
-        .i_read_en(im_read_enable),
+        .i_read_enable(im_read_enable),
         .i_ID_reset(i_reset),
         .i_reset_forward_stall(i_reset),
         .i_pipeline_enable(pipeline_enable),
         .i_MEM_debug_unit_flag(read_mem_data_from_du),
-        .i_instrmem_en(im_enable),
+        .i_instru_mem_enable(im_enable),
         .i_instru_mem_write_enable(im_write_enable),
         .i_instru_mem_data(im_data),
         .i_instru_mem_addr(im_addr),
         .i_bank_register_enable(rb_enable),
         .i_bank_register_read_enable(rb_read_enable),
-        .i_bank_register_addr(rb_addr),
+        .i_bank_register_addr(READ_SIZE),
         .i_mem_data_enable(mem_enable),
         .i_mem_data_read_enable(mem_read_enable),
         .i_mem_data_read_addr(mem_addr),
@@ -127,13 +127,12 @@ module TOP#(
         .o_halt(halt),
         .o_bank_register_data(rb_data),
         .o_mem_data_data(mem_data),
-        .o_pc(pc)
+        .o_last_pc(pc)
     );
     
     assign o_state              = state;
     assign o_uart_debug_unit_tx = uart_debug_unit_tx;
     assign o_halt               = halt;
-
     
 endmodule
 

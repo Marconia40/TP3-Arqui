@@ -1,56 +1,55 @@
 `timescale 1ns / 1ps
 `include "parameters.vh"
 module PIPELINE#(
-        parameter PC_SIZE             = 32,
-        parameter INST_SIZE    = 32,
-        parameter DATA_SIZE           = 32,
-        parameter REG_SIZE            = 5, 
-        parameter ADDR_SIZE           = 32,
-        parameter MEM_SIZE      = 8, // Dado que MEM DEPTH = 256
-        parameter MEM_ADDR_SIZE       = 5,
-        parameter OPCODE_SIZE         = 6,
-        parameter MEMORY_DEPTH      = 8, // Todas las memorias, excepto bank register tienen WIDTH = 8
-        parameter SEL_SIZE            = 2
+        parameter PC_SIZE               = 32,
+        parameter INSTRUCTION_SIZE      = 32,
+        parameter DATA_SIZE             = 32,
+        parameter REG_SIZE              = 5, 
+        parameter ADDR_SIZE             = 32,
+        parameter INSTMEM_SIZE          = 8, // Entries = 256
+        parameter ALU_OP_SIZE           = 6,
+        parameter MEM_SIZE              = 8, // Todas las memorias, excepto bank register tienen WIDTH = 8
+        parameter SELECT_SIZE           = 2
     )
     (
         input                       i_clock,
-        input                       i_pc_en,
+        input                       i_pc_enable,
         input                       i_pc_reset,
-        input                       i_read_en,
+        input                       i_read_enable,
         input                       i_ID_reset,
         input                       i_reset_forward_stall,// FORWARDING UNIT
         input                       i_pipeline_enable,    // DEBUG UNIT
         input                       i_MEM_debug_unit_flag,    // Flag de read y addr provenientes de DEBUG UNIT
-        input                       i_instrmem_en,          // DEBUG UNIT
+        input                       i_instru_mem_enable,          // DEBUG UNIT
         input                       i_instru_mem_write_enable,    // DEBUG UNIT
-        input [MEMORY_DEPTH-1:0]    i_instru_mem_data,            // DEBUG UNIT
-        input [MEM_SIZE-1:0]        i_instru_mem_addr,         // DEBUG UNIT
+        input [MEM_SIZE-1:0]    i_instru_mem_data,            // DEBUG UNIT
+        input [INSTMEM_SIZE-1:0]    i_instru_mem_addr,         // DEBUG UNIT
         input                       i_bank_register_enable,          // DEBUG UNIT
         input                       i_bank_register_read_enable,     // DEBUG UNIT
         input [REG_SIZE-1:0]          i_bank_register_addr,         // DEBUG UNIT
         input                       i_mem_data_enable,          // DEBUG UNIT
         input                       i_mem_data_read_enable,     // DEBUG UNIT
-        input [MEM_ADDR_SIZE-1:0]     i_mem_data_read_addr,    // DEBUG UNIT
+        input [REG_SIZE-1:0]     i_mem_data_read_addr,    // DEBUG UNIT
         input                       i_unit_control_enable,          // DEBUG UNIT
 
         output                      o_halt,                     // DEBUG UNIT
         output [DATA_SIZE-1:0]        o_bank_register_data,            // DEBUG UNIT
         output [DATA_SIZE-1:0]        o_mem_data_data,            // DEBUG UNIT
-        output [PC_SIZE-1:0]          o_pc             // DEBUG UNIT
+        output [PC_SIZE-1:0]          o_last_pc             // DEBUG UNIT
     );
     
     // FETCH to IF_ID_reg
     wire [PC_SIZE-1:0]            IF_last_pc;
     wire [PC_SIZE-1:0]            i_IF_adder_result;
-    wire [INST_SIZE-1:0]   i_IF_instruction;
+    wire [INSTRUCTION_SIZE-1:0]   i_IF_instruction;
     
     // IF_ID_reg to DECODE
     wire [PC_SIZE-1:0]            o_ID_adder_result;
-    wire [INST_SIZE-1:0]   o_ID_instruction;
+    wire [INSTRUCTION_SIZE-1:0]   o_ID_instruction;
     
     // DECODE to ID_EX_reg
     wire                        ID_reg_dest;
-    wire [OPCODE_SIZE-1:0]        ID_alu_op;
+    wire [ALU_OP_SIZE-1:0]        ID_alu_op;
     wire                        ID_alu_src;
     wire                        ID_mem_read;
     wire                        ID_mem_write;
@@ -87,7 +86,7 @@ module PIPELINE#(
     // ID_EX_reg to EXECUTE
     wire                        EX_signed;
     wire                        EX_reg_dest;
-    wire [OPCODE_SIZE-1:0]        EX_alu_op;
+    wire [ALU_OP_SIZE-1:0]        EX_alu_op;
     wire                        EX_alu_src;
     wire                        EX_mem_read;
     wire                        EX_mem_write;
@@ -180,46 +179,46 @@ module PIPELINE#(
     wire                        WB_halt;
 
     // FORWADING UNIT
-    wire [SEL_SIZE-1:0]           forwarding_a;
-    wire [SEL_SIZE-1:0]           forwarding_b;
-    wire [SEL_SIZE-1:0]           forwarding_mux;
+    wire [SELECT_SIZE-1:0]           forwarding_a;
+    wire [SELECT_SIZE-1:0]           forwarding_b;
+    wire [SELECT_SIZE-1:0]           forwarding_mux;
     
-    IFETCH FETCH
+    IFETCH IFETCH
     (
         .i_clock(i_clock),
-        .i_instrmem_en(i_instrmem_en),
+        .i_instru_mem_enable(i_instru_mem_enable),
         .i_branch(MEM_branch_zero),
-        .i_jal(ID_jump),
-        .i_jalr(EX_jr_jalr),
-        .i_pc_en(i_pc_en),
+        .i_j_jal(ID_jump),
+        .i_jr_jalr(EX_jr_jalr),
+        .i_pc_enable(i_pc_enable),
         .i_pc_reset(i_pc_reset),
-        .i_read_en(i_read_en),
-        .i_write_en(i_instru_mem_write_enable),
+        .i_read_enable(i_read_enable),
+        .i_write_enable(i_instru_mem_write_enable),
         .i_write_data(i_instru_mem_data),
         .i_write_addr(i_instru_mem_addr),
         .i_branch_addr(o_MEM_branch_addr),
         .i_jump_addr(ID_jump_addr),
-        .i_last_reg(EX_data_a),  // pasa por DECODE/EX PIPELINE
-        .i_stall(en_pc_stall), // STALL UNIT
-        .o_pc(IF_last_pc),  // DEBUG UNIT
-        .o_next_pc(i_IF_adder_result),
-        .o_instr(i_IF_instruction)
+        .i_data_last_register(EX_data_a),  // pasa por DECODE/EX PIPELINE
+        .i_pc_stall(en_pc_stall), // STALL UNIT
+        .o_last_pc(IF_last_pc),  // DEBUG UNIT
+        .o_adder_result(i_IF_adder_result),
+        .o_instruction(i_IF_instruction)
     );
                         
-    IF_ID IF_ID_reg
+    IF_ID IF_ID
     (
         .i_clock(i_clock),
         .i_reset(i_pc_reset),
-        .i_pipe_en(i_pipeline_enable),
+        .i_pipeline_enable(i_pipeline_enable),
         .i_enable(en_IF_ID_reg), // STALL UNIT: 1 -> data hazard (stall) 0 -> !data_hazard
         .i_flush(IF_flush),                    // STALL UNIT: 1 -> control hazards     0 -> !control_hazard
-        .i_next_pc(i_IF_adder_result),
-        .i_instr(i_IF_instruction),
-        .o_next_pc(o_ID_adder_result),
-        .o_instr(o_ID_instruction)
+        .i_adder_result(i_IF_adder_result),
+        .i_instruction(i_IF_instruction),
+        .o_adder_result(o_ID_adder_result),
+        .o_instruction(o_ID_instruction)
     );
     
-    IDECODE DECODE
+    IDECODE IDECODE
     (
         .i_clock(i_clock),
         .i_pipeline_enable(i_pipeline_enable),
@@ -260,7 +259,7 @@ module PIPELINE#(
         .o_word_enable(ID_word_enable)
     );
                         
-    ID_EX ID_EX_reg
+    ID_EX ID_EX
     (
         .i_clock(i_clock),
         .i_reset(i_pc_reset),
@@ -363,7 +362,7 @@ module PIPELINE#(
         .o_jump(o_EX_jump)
     );
                         
-    EX_MEM EX_MEM_reg
+    EX_MEM EX_MEM
     (
         .i_clock(i_clock),
         .i_reset(i_pc_reset),
@@ -447,7 +446,7 @@ module PIPELINE#(
         .o_halt(o_MEM_halt)
     );
                          
-    MEM_WB MEM_WB_reg
+    MEM_WB MEM_WB
     (
         .i_clock(i_clock),
         .i_reset(i_pc_reset),
@@ -471,7 +470,7 @@ module PIPELINE#(
         .o_halt(MEM_WB_halt)
     );
                           
-    WBACK WRITE_BACK
+    WBACK WBACK
     (
         .i_reg_write(WB_reg_write),
         .i_mem_to_reg(WB_mem_to_reg),
@@ -522,8 +521,9 @@ module PIPELINE#(
         .o_flush_EX(EX_flush)
     );
 
-  assign o_bank_register_data       = ID_data_a;           // to DEBUG UNIT
-  assign o_mem_data_data            = MEM_read_dm;         // to DEBUG UNIT
-  assign o_pc                  = IF_last_pc;          // to DEBUG UNIT
-  assign o_halt                     = WB_halt;
+    assign o_bank_register_data       = ID_data_a;           // to DEBUG UNIT
+    assign o_mem_data_data            = MEM_read_dm;         // to DEBUG UNIT
+    assign o_last_pc                  = IF_last_pc;          // to DEBUG UNIT
+    assign o_halt                     = WB_halt;
+
 endmodule

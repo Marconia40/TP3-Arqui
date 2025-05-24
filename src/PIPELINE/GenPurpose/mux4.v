@@ -1,20 +1,20 @@
 `timescale 1ns / 1ps
 
 module mux4#(
-        parameter   SIZE = 32,
-        parameter   SIZE_SELECT = 2   
+        parameter   PC_SIZE = 32,
+        parameter   SELECT_SIZE = 2   
     )
     (
-        input  [SIZE_SELECT-1:0]     i_SEL,
-        input  [SIZE-1:0]            i_A,
-        input  [SIZE-1:0]            i_B,
-        input  [SIZE-1:0]            i_C,
-        input  [SIZE-1:0]            i_D,
-        output [SIZE-1:0]            o_data
+        input  [SELECT_SIZE-1:0]     i_SEL,
+        input  [PC_SIZE-1:0]            i_A,
+        input  [PC_SIZE-1:0]            i_B,
+        input  [PC_SIZE-1:0]            i_C,
+        input  [PC_SIZE-1:0]            i_D,
+        output [PC_SIZE-1:0]            o_data
     
     );
     
-    reg [SIZE-1:0] aux_reg;
+    reg [PC_SIZE-1:0] aux_reg;
     
     always @ (*) begin
         case (i_SEL)

@@ -1,8 +1,8 @@
 `timescale 1ns / 1ps
 
 module unit_stall #(
-        parameter NB_DATA    = 32,
-        parameter NB_REG     = 5
+        parameter DATA_SIZE    = 32,
+        parameter REG_SIZE     = 5
     )    
     (   
         input                 i_reset,
@@ -12,9 +12,9 @@ module unit_stall #(
         input                 i_ID_EX_mem_read,     // PARA SOLO CON LOADS
         input                 i_EX_jump,            // Salto de Execute
         input                 i_MEM_jump,           // Salto en Memory
-        input  [NB_REG-1 : 0] i_ID_EX_rt,           // Valor de rt entre DECODE y EXECUTE
-        input  [NB_REG-1 : 0] i_IF_ID_rt,           // Valor de rt entre FETCH y DECODE
-        input  [NB_REG-1 : 0] i_IF_ID_rs,           // Valor de rs entre FETCH y DECODE
+        input  [REG_SIZE-1 : 0] i_ID_EX_rt,           // Valor de rt entre DECODE y EXECUTE
+        input  [REG_SIZE-1 : 0] i_IF_ID_rt,           // Valor de rt entre FETCH y DECODE
+        input  [REG_SIZE-1 : 0] i_IF_ID_rs,           // Valor de rs entre FETCH y DECODE
         output reg            o_flush_ID,           // 0 -> control_signals DECODE  1 -> flush signals
         output reg            o_enable_IF_ID_reg,   // 0 -> disable             1 -> enable
         output reg            o_enable_pc,          // 0 -> disable             1 -> enable

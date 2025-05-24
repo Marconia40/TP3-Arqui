@@ -2,14 +2,12 @@
 `include "parameters.vh"
 module debug_unit#(
     parameter STATE_SIZE    = 10,
-    parameter DATA_SIZE     = 8,
-    parameter ADDR_RW_SIZE     = 32,
-    parameter ADDR_RB_SIZE  = 5,
+    parameter MEM_SIZE     = 8,
+    parameter PC_SIZE     = 32,
+    parameter READ_SIZE  = 5,
     parameter BYTE_CTR_SIZE = 2,
-    parameter ADDR_DM_SIZE  = 5, 
-    parameter DM_DEPTH    = 32,
-    parameter DM_SIZE    = 32,
-    parameter RB_DEPTH    = 32,
+    parameter DATA_SIZE    = 32,
+    parameter BANK_SIZE    = 32,
     parameter PC_CTR_SIZE   = 2
 )    
 (
@@ -18,16 +16,16 @@ module debug_unit#(
     input                   i_halt,                     // proveniente del pipeline
     input                   i_rx_done,                  // meaning: RX tiene un byte listo para ser leido - UART
     input                   i_tx_done,                  // meaning: TX ya envio el byte - UART
-    input  [DATA_SIZE-1:0]    i_rx_data,                  // from RX - UART
-    input  [ADDR_RW_SIZE-1:0]    i_pc_value,                 // data read from PC 
-    input  [DM_SIZE-1:0]   i_mem_data,                 // data read from DATA mem
-    input  [ADDR_RW_SIZE-1:0]    i_bank_reg_data,            // data read from BANK REGISTER
+    input  [MEM_SIZE-1:0]    i_rx_data,                  // from RX - UART
+    input  [PC_SIZE-1:0]    i_pc_value,                 // data read from PC 
+    input  [DATA_SIZE-1:0]   i_mem_data,                 // data read from DATA mem
+    input  [BANK_SIZE-1:0]    i_bank_reg_data,            // data read from BANK REGISTER
     
-    output [DATA_SIZE-1:0]    o_instru_mem_data,          // data to write in INSTRUCTION mem
-    output [DATA_SIZE-1:0]    o_instru_mem_addr,          // addr to write INSTRUCTION mem
-    output [ADDR_RB_SIZE-1:0] o_rb_addr,                  // addr to read BANK REGISTER
-    output [ADDR_DM_SIZE-1:0] o_mem_data_addr,            // addr to read DATA mem
-    output [DATA_SIZE-1:0]    o_tx_data,                  // to TX - UART
+    output [MEM_SIZE-1:0]    o_instru_mem_data,          // data to write in INSTRUCTION mem
+    output [MEM_SIZE-1:0]    o_instru_mem_addr,          // addr to write INSTRUCTION mem
+    output [READ_SIZE-1:0] o_rb_addr,                  // addr to read BANK REGISTER
+    output [READ_SIZE-1:0] o_mem_data_addr,            // addr to read DATA mem
+    output [MEM_SIZE-1:0]    o_tx_data,                  // to TX - UART
     output                  o_tx_start,                 // to TX - UART
     output                  o_instru_mem_write_enable,  // 
     output                  o_instru_mem_read_enable,   //
@@ -47,20 +45,20 @@ reg [STATE_SIZE-1:0]      state;
 reg [STATE_SIZE-1:0]      next_state;
 reg [STATE_SIZE-1:0]      prev_state;
 reg [STATE_SIZE-1:0]      next_prev_state;
-reg [DATA_SIZE-1:0]       im_count;
-reg [DATA_SIZE-1:0]       next_instru_mem_count;          
-reg [ADDR_DM_SIZE-1:0]    count_mem_data_tx_done;
-reg [ADDR_DM_SIZE-1:0]    count_mem_data_tx_done_next;  
+reg [MEM_SIZE-1:0]       im_count;
+reg [MEM_SIZE-1:0]       next_instru_mem_count;          
+reg [READ_SIZE-1:0]    count_mem_data_tx_done;
+reg [READ_SIZE-1:0]    count_mem_data_tx_done_next;  
 reg [BYTE_CTR_SIZE-1:0]   count_mem_byte;
 reg [BYTE_CTR_SIZE-1:0]   next_count_mem_byte;
-reg [ADDR_RB_SIZE-1:0]    count_bank_reg_tx_done; 
-reg [ADDR_RB_SIZE-1:0]    next_count_bank_reg_tx_done; 
+reg [READ_SIZE-1:0]    count_bank_reg_tx_done; 
+reg [READ_SIZE-1:0]    next_count_bank_reg_tx_done; 
 reg [BYTE_CTR_SIZE-1:0]   count_bank_reg_byte;
 reg [BYTE_CTR_SIZE-1:0]   next_count_bank_reg_byte;     
 reg [PC_CTR_SIZE-1:0]     count_pc;
 reg [PC_CTR_SIZE-1:0]     next_count_pc;
-reg [DATA_SIZE-1:0]       send_data;
-reg [DATA_SIZE-1:0]       next_send_data; 
+reg [MEM_SIZE-1:0]       send_data;
+reg [MEM_SIZE-1:0]       next_send_data; 
 
 reg     im_write_enable; 
 reg     next_instru_mem_write_enable;   
@@ -322,7 +320,7 @@ always @(*) begin
                     next_count_bank_reg_byte        = 2'd0;
                     next_state                      = `READ_BR;
 
-                    if(count_bank_reg_tx_done == RB_DEPTH-1)begin
+                    if(count_bank_reg_tx_done == DATA_SIZE-1)begin
                         next_rb_read_enable  = 1'b0;
                         tx_start_next        = 1'b0;
                         if(prev_state == `STEP_BY_STEP) begin
@@ -366,7 +364,7 @@ always @(*) begin
                     next_count_mem_byte             = 2'd0;
                     next_state                      = `READ_MEM;
 
-                    if(count_mem_data_tx_done == DM_DEPTH-1)begin
+                    if(count_mem_data_tx_done == DATA_SIZE-1)begin
                         next_mem_data_read_enable   = 1'b0;
                         next_mem_data_enable        = 1'b0;
                         next_mem_data_debug_unit    = 1'b0;

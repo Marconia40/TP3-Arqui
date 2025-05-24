@@ -1,20 +1,19 @@
-    `timescale 1ns / 1ps
+`timescale 1ns / 1ps
 
-	module UART
-			#(parameter NB_DATA = 8,
-			parameter NB_OP =6
-			)
-			(
-			input wire i_clock,
-			input wire i_reset,
-			input wire i_rx,
-			input wire [NB_DATA-1:0] i_tx_data, //from ALU:
-			input wire i_tx_start,
-			output wire [NB_DATA-1:0] o_rx_data,
-			output wire o_rx_done_tick,
-			output wire o_tx,
-			output wire o_tx_done_tick
-			);
+module UART#(
+		parameter DATA_BITS = 8
+	)
+	(
+		input wire i_clock,
+		input wire i_reset,
+		input wire i_rx,
+		input wire [DATA_BITS-1:0] i_tx_data, //from ALU:
+		input wire i_tx_start,
+		output wire [DATA_BITS-1:0] o_rx_data,
+		output wire o_rx_done_tick,
+		output wire o_tx,
+		output wire o_tx_done_tick
+	);
 
 	wire s_tick_wire;
 
@@ -46,4 +45,4 @@
 		.o_tx(o_tx)
 	);    
 
-	endmodule
+endmodule
