@@ -1,74 +1,216 @@
-# ETAPA INSTRUCTION FETCH
+# Instruction Fetch (IF) Stage - Pipeline Documentation
+## Overview
 
-Es la primer fase del pipeline. El modulo es el encargado de buscar en memoria la instruccion a ejecutar (en la memoria de instrucciones) y prepararla para su decodificacion. Tambien es el encargado de decidir cual es la direccion de la proxima instruccion a ejecutarse.
-La etapa esta compuesta por varios modulos interconectados que permiten el paso fluido de datos hacia la siguiente etapa.
+The Instruction Fetch (IF) stage is the first phase of the processor pipeline. This module is responsible for fetching instructions from instruction memory and preparing them for decoding in the next pipeline stage. It also determines the address of the next instruction to be executed.
+## Module Components
+# 1. IFETCH (Top-Level Module)
 
-#### Entradas
-Seniales de control del PC:
-- i_clock : senial de reloj del sistema
-- i_pc_en : habilita el contador del programa
-- i_pc_reset : reinicia el contador del programa
-- i_stall : Si esta en 1 detiene el PC
-Seniales de control de memoria:
-- i_read_en : Habilita la lectura de la memoria de instrucciones
-- i_instrmem_en : Habilita el acceso a memoria de instrucciones
-- i_write_en : Habilita la escritura den la memoria de instrucciones
-- i_write_data [7:0] : Datos a escribir en memoria (DEBUG)
-- i_write_addr [7:0] : Direccion donde se escribe en memoria
-Direcciones de control de flujo:
-- i_branch_addr [31:0] : Direccion de destino de branch
-- i_jump_addr [31:0] : Direccion destino de jump (J y JAL)
-- i_last_reg [31:0] : Direccion destino de jump register (JR y JALR)
-Seniales de control de flujo:
-- i_branch : En 1 si hay un branch, 0 en caso contrario
-- i_jal : En 1 si hay jump, 0 si no
-- i_jalr : En 1 si hay jump register, 0 si no
+The main module that coordinates all components of the instruction fetch stage.
+## Parameters
 
-#### Salidas
-- o_pc [31:0] : Direccion actual del Program Counter
-- o_next_pc [31:0] : Direccion del siguiente program counter (PC + 4)
-- o_instr [31:0] : Instruccion obtenida desde la memoria
+    PC_SIZE (default: 32): Size of the program counter in bits
 
-## MODULOS
-### program_counter.v (PC)
-Es el responsable de mantener la direccion de la instruccion actual y actualizarla para apuntar a la siguiente instruccion en cada ciclo de reloj.
+    INSTRUCTION_SIZE (default: 32): Size of instructions in bits
 
-#### Entradas
-- i_enable : utilizado para habilitar el modulo
-- i_clock : senial de reloj del sistema
-- i_reset : Reinicia el contador del programa
-- i_pc_stall : Senial de parada que decide si el PC se actualiza o no
+    INSTMEM_SIZE (default: 8): Size of instruction memory address bus
 
-#### Salidas
-- o_pc : Direccion de la siguiente instruccion a ejecutar
+    MEM_SIZE (default: 8): Size of memory data bus
 
-#### Funcionamiento
-Si i_enable esta actuvo, la salida o_pc se actualiza con el valor de i_pc_next.
+## Inputs
 
-### inst_mem.v
-Representa la memoria donde se almacenan las instrucciones del programa.
+### Clock and Control Signals:
 
-#### Entradas
-- i_address : Direccion de la instruccion a leer
-- i_clock : Senial de sincronizacion con el sistema
+        i_clock: System clock signal
 
-#### Salidas
-- o_instruction : Instruccion leida en la direccion i_address
+        i_pc_enable: Enables the program counter
 
-#### Funcionamiento
-Lee la instruccion almacenada en i_address en la memoria ROM y la envia como salida en o_instruction.
+        i_pc_reset: Resets the program counter to zero
 
-### latch.v
-Almacena temporalmente la instrucción obtenida de la memoria para enviarla a la siguiente etapa del pipeline.
+        i_pc_stall: Stalls the PC when active (1 = stall, 0 = normal operation)
 
-#### Entradas
-- i_reset : Borra el contenido del latch
-- i_clock : Sincronizacion con el sistema
-- i_enable : Habilita el almacenamiento de datos
-- i_data : Instrucción desde la memoria
+### Memory Control Signals:
 
-#### Salidas
-- o_data : Instrucción lista para la siguiente etapa
+        i_read_enable: Enables instruction memory read operations
 
-#### Funcionamiento
-Cuando i_enable esta activo, o_data almacena el valor de i_data.
+        i_instru_mem_enable: Enables the instruction memory
+
+        i_write_enable: Enables instruction memory writes (for debug purposes)
+
+        i_write_data: Data to write to instruction memory (debug)
+
+        i_write_addr: Address for instruction memory writes (debug)
+
+### Branch/Jump Control:
+
+        i_branch: Indicates a branch instruction (1 = branch, 0 = no branch)
+
+        i_j_jal: Indicates a jump instruction (J or JAL)
+
+        i_jr_jalr: Indicates a jump register instruction (JR or JALR)
+
+### Target Addresses:
+
+        i_branch_addr: Branch target address
+
+        i_jump_addr: Jump target address (for J and JAL)
+
+        i_data_last_register: Jump target address (for JR and JALR)
+
+## Outputs
+
+    o_last_pc: Current program counter value
+
+    o_adder_result: Next sequential PC value (PC + 4)
+
+    o_instruction: Fetched instruction from memory
+
+## Functionality
+
+The IFETCH module coordinates all components of the instruction fetch stage:
+
+    Manages the program counter to track instruction addresses
+
+    Handles branch and jump target selection through multiplexers
+
+    Interfaces with instruction memory to fetch instructions
+
+    Calculates the next sequential address (PC + 4)
+
+    Provides stall capability for pipeline control
+
+# 2. program_counter.v
+
+Maintains and updates the program counter value.
+## Parameters
+
+    PC_SIZE (default: 32): Size of the program counter in bits
+
+## Inputs
+
+    i_enable: Module enable signal
+
+    i_clock: System clock
+
+    i_reset: Resets PC to zero when active
+
+    i_mux_pc: Next PC value from multiplexer
+
+    i_pc_stall: When 1, PC maintains current value; when 0, updates normally
+
+## Outputs
+
+    o_pc: Current program counter value
+
+## Functionality
+
+    Updates the PC value on each clock cycle when enabled
+
+    Can be reset to zero
+
+    Supports stalling to maintain current PC value
+
+    Outputs current PC value to instruction memory and adder
+
+# 3. inst_mem.v
+
+Instruction memory module that stores and provides program instructions.
+## Parameters
+
+    MEM_SIZE (default: 8): Size of memory data bus
+
+    ENTRIES_SIZE (default: 256): Depth of instruction memory (number of entries)
+
+    DIR_ADDR_SIZE (default: 8): Size of address bus for writes
+
+    ADDR_SIZE (default: 32): Size of address bus for reads
+
+    INSTRUCTION_SIZE (default: 32): Size of instructions in bits
+
+## Inputs
+
+    i_clock: System clock
+
+    i_enable: Memory enable signal
+
+    i_read_enable: Enables read operations
+
+    i_write_enable: Enables write operations (for debug)
+
+    i_write_data: Data to write to memory (debug)
+
+    i_write_addr: Write address (debug)
+
+    i_read_addr: Read address (from PC)
+
+## Outputs
+
+    o_read_data: Fetched instruction (32 bits)
+
+## Functionality
+
+    Stores program instructions in a block RAM (BRAM)
+
+    Reads 32-bit instructions by combining four 8-bit memory locations
+
+    Supports debug writes to memory when enabled
+
+    Outputs the instruction at the current PC address
+
+# 4. latch.v
+
+Pipeline register that holds the next PC value between stages.
+## Parameters
+
+    PC_SIZE (default: 32): Size of the PC value in bits
+
+## Inputs
+
+    i_clock: System clock
+
+    i_next_pc: Next PC value to store
+
+## Outputs
+
+    o_next_pc: Registered output of next PC value
+
+## Functionality
+
+    Simple register that captures the next PC value (PC + 4) on clock edges
+
+    Helps maintain pipeline timing by registering signals between stages
+
+## Data Flow
+
+    The program counter provides the current instruction address
+
+    The instruction memory returns the instruction at that address
+
+    An adder calculates PC + 4 (next sequential address)
+
+    Multiplexers select between:
+
+        Sequential address (PC + 4)
+
+        Branch target address
+
+        Jump target address
+
+        Register-based jump address
+
+    The selected address becomes the next PC value
+
+    The current PC and instruction are passed to the next pipeline stage
+
+## Control Flow
+
+The module supports several control flow operations:
+
+    Sequential execution: PC increments by 4 each cycle
+
+    Branches: PC updates to branch target when taken
+
+    Jumps: PC updates to absolute jump address
+
+    Jump registers: PC updates to address from register file
+
+    Stalls: PC maintains current value when pipeline is stalled
