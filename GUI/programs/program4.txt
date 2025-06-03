@@ -1,0 +1,13 @@
+addi R1, 256
+addi R2, 43981
+addi R3, 4660
+sw R2, 0(R1)
+sh R3, 4(R1)
+lw R4, 0(R1)
+lh R5, 4(R1)
+addi R6, 10
+addi R7, 10
+beq R6, R7, 1
+addi R8, 1
+addi R9, 20
+halt

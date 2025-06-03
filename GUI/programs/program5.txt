@@ -1,0 +1,10 @@
+addi R1, 5        # R1 = 5
+addi R2, 10       # R2 = 10
+addu R3, R1, R2   # R3 = 15 (RAW en R1/R2)
+addu R1, R3, R2   # R1 = 25 (WAW en R1, RAW en R3/R2)
+sw R1, 0(R0)      # Mem[0] = 25 (RAW en R1)
+lw R4, 0(R0)      # R4 = 25 (RAW en memoria)
+beq R4, R1, 1     # Salta si 25 == 25 (RAW en R4/R1)
+addi R5, 100      # No ejecutado
+addi R6, 200      # R6 = 200 (ejecutado)
+halt
