@@ -1,101 +1,199 @@
-# DEBUG UNIT
-El módulo debug_unit.v es una unidad de depuración (debug) que actúa como interfaz entre un sistema de procesamiento (pipeline) y una UART, permitiendo controlar y monitorear el sistema durante su ejecución.
+# Debug Unit Documentation
+## Overview
 
-## 🔹 Propósito General
-Este módulo permite:
-- Cargar instrucciones en la memoria de instrucciones (IM) vía UART
-- Controlar la ejecución del pipeline (ejecución paso a paso, continua, etc.)
-- Leer y enviar datos del sistema (PC, memoria de datos, banco de registros) para depuración
+The debug unit module provides comprehensive debugging capabilities for the MIPS pipeline processor through a UART interface. It allows for processor control, memory inspection, and register file access during operation.
+## Key Features
 
-## 🔹 Parámetros Principales
-    NB_STATE    = 10,      // Bits para estados FSM
-    NB_DATA     = 8,       // Ancho de datos (bytes)
-    NB_ADDR     = 32,      // Ancho de direcciones
-    NB_ADDR_RB  = 5,       // Bits para direccionar banco de registros (2^5=32 registros)
-    NB_BYTE_CTR = 2,       // Contador de bytes (4 bytes por palabra)
-    NB_ADDR_DM  = 5,       // Bits para direccionar memoria de datos
-    DM_DEPTH    = 32,      // Profundidad memoria de datos
-    RB_DEPTH    = 32,      // Número de registros
-    NB_PC_CTR   = 2;       // Contador para bytes del PC
+### UART Communication Interface:
 
-## 🔹 Interfaces Principales
-### Entradas:
-- Control: i_clock, i_reset, i_halt (señal de parada del pipeline)
-- UART: i_rx_done, i_tx_done, i_rx_data (comunicación serial)
-- Datos del sistema: i_pc_value, i_mem_data, i_bank_reg_data
+-        Receives commands via RX
 
-### Salidas:
-- Control de memoria: enables y señales de lectura/escritura para IM y DM
-- Control de banco de registros: enables y direcciones
-- UART: o_tx_data, o_tx_start para transmisión
-- Control general: o_pipeline_enable, o_state (estado actual)
+-       Transmits data via TX
 
-# 🔹 Máquina de Estados Finitos
-La unidad implementa una maquina finita con los siguientes estados (definidos en parameters.vh):
+-        Handles byte-level communication
 
-**INITIAL**: Estado inicial, espera comandos por UART
+### Processor Control:
 
-**WRITE_IM**: Escribe instrucciones en la memoria de instrucciones
+-        Start/stop execution
 
-**READY**: Sistema listo para ejecución
+-        Single-step operation
 
-**START**: Ejecución continua del pipeline
+-        Pipeline enable/disable
 
-**STEP_BY_STEP**: Modo paso a paso
+### Memory Access:
 
-**SEND_PC**: Envía valor del PC por UART
+-        Instruction memory writes
 
-**READ_BR/SEND_BR**: Lee y envía valores del banco de registros
+-        Data memory reads
 
-**READ_MEM/SEND_MEM**: Lee y envía valores de la memoria de datos
+-        Byte-level memory inspection
 
-## 🔹 Funcionamiento Detallado
-1. Escritura de Instrucciones (WRITE_IM)
-    
-    a.   Cuando se recibe el comando CMD_WRITE_IM por UART:
-        i.   Habilita escritura en IM (im_write_enable = 1)
-        ii.   Usa im_count como dirección y i_rx_data como dato
-        iii.   Después de escribir 254 instrucciones, vuelve a READY
+### Register Inspection:
 
-2. Control de Ejecución
-    
-    a.  Ejecución continua (START):
-        i.  Habilita todos los módulos (IM, DM, banco de registros, PC)
-        ii.  Permite que el pipeline ejecute hasta i_halt
+-        Full register file access
 
-    b.  Paso a paso (STEP_BY_STEP):
-        i.  Espera comando CMD_STEP para ejecutar una instrucción
-        ii. Después de cada paso, envía estado actual (SEND_PC, SEND_MEM, SEND_BR)
+-        32-bit register value reading
 
-3. Envío de Datos para Depuración
-    
-    a. PC (SEND_PC):
-        i.  Envía los 4 bytes del PC secuencialmente por UART
-        ii. Usa count_pc para seleccionar qué byte enviar
+### Status Monitoring:
 
-    b.  Memoria de Datos (READ_MEM/SEND_MEM):
-        i.  Lee toda la memoria (32 palabras) y envía cada byte
-        ii. count_mem_data_tx_done es la dirección, count_mem_byte selecciona el byte
+-        Program counter inspection
 
-    c.  Banco de Registros (READ_BR/SEND_BR):
-        i.  Similar a memoria, pero para los 32 registros
+-        Processor halt detection
 
-## 🔹 Registros y Controles Internos
--   Registros de estado: state, prev_state (guarda estado anterior)
--   Contadores:
-    1.  im_count: Dirección para escribir en IM
-    2.  count_mem_data_tx_done: Dirección memoria de datos
-    3.  count_bank_reg_tx_done: Dirección banco de registros
-    4.  count_pc, count_mem_byte, count_bank_reg_byte: Para seleccionar bytes
+## Interface
+### Inputs
+Signal	Width	Description
+i_clock	1	System clock
+i_reset	1	Active-high reset
+i_halt	1	Processor halt status
+i_rx_done	1	UART RX byte ready
+i_tx_done	1	UART TX byte sent
+i_rx_data	8	Received UART data
+i_pc_value	32	Current PC value
+i_mem_data	32	Data memory contents
+i_bank_reg_data	32	Register file data
+### Outputs
+Signal	Width	Description
+o_instru_mem_data	8	Instruction memory write data
+o_instru_mem_addr	8	Instruction memory address
+o_rb_addr	5	Register file read address
+o_mem_data_addr	5	Data memory read address
+o_tx_data	8	UART transmit data
+o_tx_start	1	UART transmit start
+o_instru_mem_write_enable	1	Instruction memory write enable
+o_instru_mem_read_enable	1	Instruction memory read enable
+o_instru_mem_enable	1	Instruction memory enable
+o_rb_read_enable	1	Register file read enable
+o_rb_enable	1	Register file enable
+o_mem_data_enable	1	Data memory enable
+o_mem_data_read_enable	1	Data memory read enable
+o_mem_data_debug_unit	1	Data memory debug access
+o_unit_control_enable	1	Control unit enable
+o_pc_enable	1	Program counter enable
+o_state	10	Current debug state
+o_pipeline_enable	1	Pipeline enable
+## Command Set
 
-## 🔹 Flujo de Datos
-**Recepción UART →** i_rx_done activa transiciones de estado
+The debug unit responds to the following UART commands:
+Command	Value	Description
+CMD_WRITE_IM	0x01	Write to instruction memory
+CMD_SEND_INFO	0x02	Request processor state
+CMD_STEP_BY_STEP	0x03	Enter single-step mode
+CMD_CONTINUE	0x04	Resume continuous execution
+CMD_STEP	0x05	Execute single instruction
+## State Machine
 
-**Procesamiento →** Según estado actual y comandos recibidos
+The debug unit operates through these states:
 
-**Transmisión UART →** tx_start inicia envío de datos depurados
+### INITIAL:
 
-## 🔹 Consideraciones de Diseño
-- **Sincronización**: Todos los cambios ocurren en flanco negativo de reloj (negedge i_clock)
-- **Reset**: Limpia todos los registros y contadores
-- **Modo Debug**: Cuando se está enviando datos (SEND_*), deshabilita el pipeline
+-        Waits for initial command
+
+-        Disables all processor components
+
+### WRITE_IM:
+
+-        Handles instruction memory programming
+
+-        Writes sequential bytes from UART
+
+### READY:
+
+-        Waits for execution command
+
+-        Ready for step/continue operations
+
+### START:
+
+-        Continuous execution mode
+
+-        Monitors for halt condition
+
+### STEP_BY_STEP:
+
+-        Single-step execution mode
+
+-        Requires step command for each instruction
+
+### SEND_PC:
+
+-        Transmits PC value via UART
+
+-        Sends 4 bytes (MSB first)
+
+### SEND_MEM:
+
+-        Transmits data memory contents
+
+-        Scans entire memory space
+
+### SEND_BR:
+
+-        Transmits register file contents
+
+-        Scans all 32 registers
+
+## Operation Modes
+### Programming Mode
+
+    Activated by CMD_WRITE_IM
+
+    Loads instruction memory via UART
+
+    Sequential byte writes
+
+    Automatic address increment
+
+### Inspection Mode
+
+    Activated by CMD_SEND_INFO
+
+    Transmits:
+
+        Current PC value
+
+        Data memory contents
+
+        Register file contents
+
+    Big-endian byte order
+
+### Execution Control
+
+    Continuous mode: Free-running execution
+
+    Single-step mode: Manual instruction advance
+
+    Automatic halt detection
+
+## Timing Characteristics
+
+    Synchronous to system clock
+
+    UART operations are byte-oriented
+
+    State transitions occur on clock edges
+
+    All control signals are registered
+
+## Usage Example
+
+    Reset processor
+
+    Send CMD_WRITE_IM to enter programming mode
+
+    Send instruction bytes (256 max)
+
+    Send CMD_STEP_BY_STEP for single-step debugging
+
+    Send CMD_STEP to execute each instruction
+
+    Send CMD_SEND_INFO to inspect state
+
+## Error Handling
+
+    Automatic state reset on system reset
+
+    Byte counters reset after complete transfers
+
+    Safe defaults for all control signals
