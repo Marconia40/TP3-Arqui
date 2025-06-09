@@ -10,6 +10,6 @@ module expand#(
     );
 
     always@(*) begin
-        o_data = {27'b0, i_data};
+        o_data = { {27{1'b0}}, i_data };
     end    
 endmodule

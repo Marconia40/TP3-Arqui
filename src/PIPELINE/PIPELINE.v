@@ -60,7 +60,7 @@ module PIPELINE#(
     wire [DATA_SIZE-1:0]          ID_data_a;
     wire [DATA_SIZE-1:0]          ID_data_b;
     wire [PC_SIZE-1:0]            ID_immediate;
-    wire [DATA_SIZE-1:0]          ID_shamt;
+    wire [REG_SIZE-1:0]           ID_shamt;
     wire [REG_SIZE-1:0]           ID_rt;
     wire [REG_SIZE-1:0]           ID_rd;
     wire [REG_SIZE-1:0]           ID_rs;
@@ -459,7 +459,7 @@ module PIPELINE#(
         .i_selected_reg(o_MEM_selected_reg),
         .i_last_register_ctrl(o_MEM_last_register_ctrl),
         .i_pc(o_MEM_pc),
-        .i_halt(MEM_halt),
+        .i_halt(o_MEM_halt),
 
         .o_reg_write(WB_reg_write),
         .o_mem_to_reg(WB_mem_to_reg),

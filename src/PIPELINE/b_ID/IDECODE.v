@@ -38,7 +38,7 @@ module IDECODE#(
         output [DATA_SIZE-1:0]        o_data_a,
         output [DATA_SIZE-1:0]        o_data_b,
         output [PC_SIZE-1:0]          o_immediate,                // immediate 32b / function code
-        output [DATA_SIZE-1:0]        o_shamt,
+        output [REG_SIZE-1:0]        o_shamt,
         output [REG_SIZE-1:0]         o_rt,
         output [REG_SIZE-1:0]         o_rd,
         output [REG_SIZE-1:0]         o_rs,

@@ -46,3 +46,4 @@ set_property PACKAGE_PIN A18 [get_ports o_uart_debug_unit_tx]
 ## Configuration options, can be used for all designs
 set_property CONFIG_VOLTAGE 3.3 [current_design]
 set_property CFGBVS VCCO [current_design]
+

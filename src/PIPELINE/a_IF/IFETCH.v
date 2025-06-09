@@ -33,7 +33,7 @@ module IFETCH#(
     wire [PC_SIZE-1:0]            mux2_1_output;
     wire [PC_SIZE-1:0]            mux2_2_output;
     wire [PC_SIZE-1:0]            mux2_3_output;
-    wire [PC_SIZE-1:0]            jump_addr;
+    //wire [PC_SIZE-1:0]            jump_addr;
     wire [INSTRUCTION_SIZE-1:0]   instruction;
 
     reg [PC_SIZE-1:0]    pc_constant = 32'd4;

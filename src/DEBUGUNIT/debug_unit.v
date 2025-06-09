@@ -184,13 +184,15 @@ always @(*) begin
                         next_state          = `WRITE_IM;
                         next_prev_state     = `INITIAL;
                     end
-
                     `CMD_SEND_INFO:begin
                         next_state          = `SEND_PC;
                         next_prev_state     = `INITIAL;
                     end
-
-                endcase
+                    default: begin
+                        // Mantener el estado actual
+                        next_state = state;
+                    end
+                endcase   
             end
         end
         `READY: begin
@@ -199,7 +201,10 @@ always @(*) begin
                 case(i_rx_data)
                     `CMD_STEP_BY_STEP:   next_state = `STEP_BY_STEP;
                     `CMD_CONTINUE:       next_state = `START;
-                endcase
+                    default: begin
+                        next_state = state;
+                    end
+                endcase 
             end
         end
         `START: begin
@@ -232,6 +237,9 @@ always @(*) begin
                     `CMD_CONTINUE: begin
                         next_state      = `START;
                         next_prev_state = `INITIAL;
+                    end
+                    default: begin
+                        next_state      = state; // No hacer nada
                     end    
                 endcase
             end
@@ -278,6 +286,7 @@ always @(*) begin
                 2'd1:   next_send_data = i_pc_value[23:16];
                 2'd2:   next_send_data = i_pc_value[15:8];
                 2'd3:   next_send_data = i_pc_value[7:0];
+                default: next_send_data = 8'b0;
             endcase
             if(i_tx_done)begin
                 tx_start_next = 1'b0;
@@ -309,6 +318,7 @@ always @(*) begin
                 2'd1:   next_send_data = i_bank_reg_data[23:16];
                 2'd2:   next_send_data = i_bank_reg_data[15:8];
                 2'd3:   next_send_data = i_bank_reg_data[7:0];
+                default: next_send_data = 8'b0;
             endcase
 
             if(i_tx_done)begin
@@ -353,6 +363,7 @@ always @(*) begin
                 2'd1:   next_send_data = i_mem_data[23:16];
                 2'd2:   next_send_data = i_mem_data[15:8];
                 2'd3:   next_send_data = i_mem_data[7:0];
+                default: next_send_data = 8'b0;
             endcase
 
             if(i_tx_done)begin
@@ -373,6 +384,30 @@ always @(*) begin
                     end
                 end
             end
+        end
+        default: begin
+            // Mantener todos los valores por defecto
+            next_state                      = state;
+            next_prev_state                 = prev_state;
+            next_mem_data_enable            = dm_enable;
+            next_mem_data_read_enable       = dm_read_enable;
+            next_mem_data_debug_unit        = dm_debug_unit;
+            next_count_mem_byte             = count_mem_byte;
+            count_mem_data_tx_done_next     = count_mem_data_tx_done;
+            next_count_bank_reg_byte        = count_bank_reg_byte;
+            next_count_bank_reg_tx_done     = count_bank_reg_tx_done;
+            next_count_pc                   = count_pc;
+            next_pc_enable                  = pc_enable;
+            next_instru_mem_enable          = im_enable;
+            next_instru_mem_write_enable    = im_write_enable;
+            next_instru_mem_read_enable     = im_read_enable;
+            next_instru_mem_count           = im_count;
+            next_rb_enable                  = rb_enable;
+            next_rb_read_enable             = rb_read_enable;
+            next_send_data                  = send_data;
+            next_unit_control_enable        = unit_control_enable;
+            next_pipeline_enable            = pipeline_enable;
+            tx_start_next                   = tx_start;
         end
     endcase
 end
