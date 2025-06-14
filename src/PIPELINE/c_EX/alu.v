@@ -10,24 +10,23 @@ module alu#(
         input       [ALU_CTRL_SIZE-1 : 0]    i_alu_ctrl, // codigo de operacion que viene de la alu_control
         output                              o_zero,
         output reg signed [DATA_SIZE-1 : 0]    o_result 
-    );
-   
+    );   
     always@(*) begin
         case(i_alu_ctrl)
             4'h0 : begin
-                o_result =   i_B << i_A;      // SLL Shift left logical (r1<<r2) y SLLV
+                o_result =   i_B << i_A[4:0];     // SLL/SLLV Shift left logical (rt << shamt/rs[4:0])
             end
             4'h1 : begin
-                o_result =   i_B >> i_A;      // SRL Shift right logical (r1>>r2) y SRLV
+                o_result =   i_B >> i_A[4:0];     // SRL/SRLV Shift right logical (rt >> shamt/rs[4:0])
             end
             4'h2 : begin
-                o_result =   i_B >>> i_A;     // SRA  Shift right arithmetic (r1>>>r2) y SRAV
+                o_result =   i_B >>> i_A[4:0];    // SRA/SRAV Shift right arithmetic (rt >>> shamt/rs[4:0])
             end
             4'h3 : begin
-                o_result =   i_A + i_B;       // ADD Sum (r1+r2)
+                o_result =   i_A + i_B;           // ADD/ADDI Sum (rs+rt/immediate)
             end
             4'h4 : begin
-                o_result =   i_A - i_B;       // SUB Substract (r1-r2)
+                o_result =   i_A - i_B;           // SUB Substract (rs-rt)
             end
             4'h5 : begin
                 o_result =   i_A & i_B;       // AND Logical and (r1&r2)
@@ -40,18 +39,17 @@ module alu#(
             end
             4'h8 : begin
                 o_result = ~(i_A | i_B);      // NOR Logical nor ~(r1|r2)
-            end
-            4'h9 : begin 
-                o_result =   i_A < i_B;       // SLT Compare (r1<r2)
+            end            4'h9 : begin 
+                o_result =   i_A < i_B;       // SLT Compare (rs < rt)
             end
             4'ha : begin
-                o_result =   i_B << 16;       // SLL16
+                o_result =   i_B << 16;       // LUI - Load Upper Immediate (immediate << 16)
             end
             4'hb : begin
-                o_result =   i_A != i_B;      // BEQ: Invertida porque AND a la entrada espera un 1 para saltar
+                o_result =   i_A == i_B;      // BEQ: resultado 1 si iguales (salta), 0 si diferentes
             end
             4'hc : begin
-                o_result =   i_A == i_B;      // BNEQ: Invertida 
+                o_result =   i_A != i_B;      // BNE: resultado 1 si diferentes (salta), 0 si iguales
             end
             default : begin 
                 o_result =  {DATA_SIZE{1'b0}};
