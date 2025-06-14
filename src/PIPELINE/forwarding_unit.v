@@ -16,8 +16,12 @@ module forwarding_unit #(
         output reg  [SELECT_SIZE-1:0]   o_forwarding_a,      // Si se forwardea el valor de A
         output reg  [SELECT_SIZE-1:0]   o_forwarding_b,      // Si se forwardea el valor de B
         output reg  [SELECT_SIZE-1:0]   o_forwarding_mux     // Dato normal(10), Dato de WriteBack (01), Dato de Memoria (00)(Elije en el mux de EXECUTE)
-    );
-    always@(*) begin
+    );    always@(*) begin
+        // Inicializar todas las salidas para evitar latches
+        o_forwarding_a      = 2'b0;
+        o_forwarding_b      = 2'b0;
+        o_forwarding_mux    = 2'b10;            // Dato normal por defecto
+        
         if(i_reset) begin
             o_forwarding_a      = 2'b0;
             o_forwarding_b      = 2'b0;

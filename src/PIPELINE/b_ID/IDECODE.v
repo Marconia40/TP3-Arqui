@@ -34,11 +34,11 @@ module IDECODE#(
         output                      o_jump,                     // DECODE, signal
         output                      o_halt,
         output                      o_jr_jalr,                  // FETCH
-        output [PC_SIZE-1:0]          o_jump_addr,  
+        output [PC_SIZE-1:0]          o_jump_addr,        
         output [DATA_SIZE-1:0]        o_data_a,
         output [DATA_SIZE-1:0]        o_data_b,
         output [PC_SIZE-1:0]          o_immediate,                // immediate 32b / function code
-        output [REG_SIZE-1:0]        o_shamt,
+        output [DATA_SIZE-1:0]        o_shamt,  // Cambiado a DATA_SIZE para coincidir con expand
         output [REG_SIZE-1:0]         o_rt,
         output [REG_SIZE-1:0]         o_rd,
         output [REG_SIZE-1:0]         o_rs,

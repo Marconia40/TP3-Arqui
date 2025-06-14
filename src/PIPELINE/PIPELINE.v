@@ -58,9 +58,9 @@ module PIPELINE#(
     wire                        ID_reg_write;
     wire                        ID_mem_to_reg;
     wire [DATA_SIZE-1:0]          ID_data_a;
-    wire [DATA_SIZE-1:0]          ID_data_b;
+    wire [DATA_SIZE-1:0]          ID_data_b;    
     wire [PC_SIZE-1:0]            ID_immediate;
-    wire [REG_SIZE-1:0]           ID_shamt;
+    wire [DATA_SIZE-1:0]          ID_shamt;  // Cambiado a DATA_SIZE para coincidir con expand
     wire [REG_SIZE-1:0]           ID_rt;
     wire [REG_SIZE-1:0]           ID_rd;
     wire [REG_SIZE-1:0]           ID_rs;
