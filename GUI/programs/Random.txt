@@ -10,6 +10,6 @@ slt R9, R2, R1
 addu R11, R3, R4
 subu R12, R11, R1
 and R13, R11, R12
-addi R17, 1
-sllv R18, R1, R17
+addi R14, 1
+sllv R15, R1, R14
 halt
