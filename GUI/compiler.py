@@ -12,9 +12,21 @@ def make_R(instruccion, file):
   rt = "00000"
   if(instruccion[0] in Inst_R.keys()):
     funct = Inst_R[instruccion[0]].lower()
-    rd = registros[instruccion[1]].upper()
-    rs = registros[instruccion[2]].upper()
-    rt = registros[instruccion[3]].upper()
+    # Instrucciones de shift que usan shamt (sll, srl, sra)
+    if instruccion[0] in ["sll", "srl", "sra"]:
+      rd = registros[instruccion[1].upper()]    # registro destino
+      rt = registros[instruccion[2].upper()]    # registro fuente
+      rs = "00000"                              # no se usa rs en shifts con inmediato
+      shamp = format(int(instruccion[3]), '05b') # cantidad de shift (5 bits)
+    else:
+      # Instrucciones R normales (deben tener 4 elementos)
+      if len(instruccion) >= 4:
+        rd = registros[instruccion[1].upper()]
+        rs = registros[instruccion[2].upper()]
+        rt = registros[instruccion[3].upper()]
+      else:
+        # Para instrucciones especiales como halt que pueden tener menos parámetros
+        print(f"Warning: Instrucción {instruccion[0]} con {len(instruccion)} elementos")
 
   print(R(opcode, rs, rt, rd, shamp, funct))
   return R(opcode, rs, rt, rd, shamp, funct)
@@ -35,6 +47,17 @@ def make_I(instruccion, file):
       rs = registros[instruccion[1].upper()]
       rt = registros[instruccion[2].upper()]
       inm = format(int(instruccion[3]), '016b')
+    elif(instruccion[0] in ["addi", "andi", "ori", "xori", "slti"]):
+      # Instrucciones I-Type con 3 operandos: rt = rs op imm
+      if(instruccion[2].startswith('R')):  # addi rt, rs, imm
+          rt = registros[instruccion[1].upper()]  # registro destino
+          rs = registros[instruccion[2].upper()]  # registro fuente
+          inm = format(int(instruccion[3]), '016b')  # valor inmediato
+      else:  # addi rt, rs, imm
+          rt = registros[instruccion[1].upper()]
+          rs = "00000"  # $zero
+          inm = format(int(instruccion[2]), '016b')
+
     else:
       rt = registros[instruccion[1].upper()]
       inm = format(int(instruccion[2]), '016b')
@@ -82,7 +105,7 @@ def compilar(file : str):
     line_count = 0
     for linea in programa:
         print("Compiling instruction: ", linea)
-        instruccion = linea.split(" ")
+        instruccion = [x for x in linea.strip().split(" ") if x]  # ← AQUÍ ESTÁ LA CLAVE
         func = instruccion[0]
         asm = ""
         #Type R

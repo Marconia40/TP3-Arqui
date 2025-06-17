@@ -1,0 +1,27 @@
+addi R4, 7123 
+addi R3, 85 
+addu R5, R4, R3 
+subu R6, R4, R3 
+and R7, R4, R3 
+or R8, R4, R3 
+xor R9, R4, R3
+nor R10, R4, R3
+slt R11, R3, R4
+sll R12, R10, 2
+srl R13, R10, 2
+sra R14, R10, 2
+sllv R15, R10, R11
+srlv R16, R10, R11
+srav R17, R10, R11
+sb R13, 4(0)
+sh R13, 8(0)
+sw R13, 12(0)
+lb R18, 12(0)
+andi R19, R18, 6230
+lh R20, 12(0)
+ori R21, R20, 6230
+lw R22, 12(0)
+xori R23, R22, 6230
+lui R25, 6230
+slti R27, R4, 22614
+halt

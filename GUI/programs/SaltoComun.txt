@@ -1,0 +1,9 @@
+addi R1, 10
+addi R2, 20
+j 6
+addi R3, 99
+addi R4, 88
+addi R5, R1, 5  
+addi R6, R2, 10
+addi R7, 100
+halt

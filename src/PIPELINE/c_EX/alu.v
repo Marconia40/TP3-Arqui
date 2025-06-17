@@ -46,10 +46,10 @@ module alu#(
                 o_result =   i_B << 16;       // LUI - Load Upper Immediate (immediate << 16)
             end
             4'hb : begin
-                o_result =   i_A == i_B;      // BEQ: resultado 1 si iguales (salta), 0 si diferentes
+                o_result =   i_A != i_B;      // BEQ: Invertida porque AND a la entrada espera un 1 para saltar
             end
             4'hc : begin
-                o_result =   i_A != i_B;      // BNE: resultado 1 si diferentes (salta), 0 si iguales
+                o_result =   i_A == i_B;      // BNE: Invertidas
             end
             default : begin 
                 o_result =  {DATA_SIZE{1'b0}};

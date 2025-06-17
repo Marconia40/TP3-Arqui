@@ -1,8 +1,0 @@
-addi R1, 42       # R1 = 42
-jal R10           # R10 = PC+4, salta a "func"
-addi R2, 1        # No ejecutado (retorno aquí)
-
-func:
-addi R3, R1, 1    # R3 = 43 (RAW en R1)
-jr R10            # Retorna a addi R2 (pero termina por halt)
-halt
