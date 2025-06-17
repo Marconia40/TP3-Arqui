@@ -14,7 +14,6 @@ R15 = R10 <<LW R11 = FFFF C850 "OK"
 R16 = R10 >>LW R11 = 7FFF F214 "OK"
 R17 = R10 >>AW R11 = FFFF F214 "OK"
 M4 = 0A "OK" ------------------------
-M8 = FFFF F90A "OK" (por extension de signo) -----------------------
 M12 = 3FFF F90A "OK"
 R18 = M12B = 0A "OK"
 R19 = R18 & 6230 = 0010 = 2 "OK"

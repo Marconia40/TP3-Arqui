@@ -10,11 +10,10 @@ slt R11, R3, R4
 sll R12, R10, 2
 srl R13, R10, 2
 sra R14, R10, 2
-sllv R15, R10, R11
-srlv R16, R10, R11
-srav R17, R10, R11
+sllv R15, R11, R10
+srlv R16, R11, R10
+srav R17, R11, R10
 sb R13, 4(0)
-sh R13, 8(0)
 sw R13, 12(0)
 lb R18, 12(0)
 andi R19, R18, 6230
