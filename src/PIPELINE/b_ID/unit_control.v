@@ -149,7 +149,7 @@ module unit_control#(
                         o_mem_to_reg        <= 1'b1; // read salida data memory
                         o_jump              <= 1'b0;
                         o_byte_enable       <= 1'b0;
-                        o_halfword_enable   <= 1'b1;
+                        o_halfword_enable   <= 1'b1; // HALFWORD
                         o_word_enable       <= 1'b0;
                         o_jr_jalr           <= 1'b0;
                         o_halt              <= 1'b0;
@@ -182,7 +182,7 @@ module unit_control#(
                         o_jump              <= 1'b0;
                         o_byte_enable       <= 1'b0;
                         o_halfword_enable   <= 1'b0;
-                        o_word_enable       <= 1'b1;
+                        o_word_enable       <= 1'b1;  //WORD
                         o_jr_jalr           <= 1'b0;
                         o_halt              <= 1'b0;
                     end
@@ -196,7 +196,7 @@ module unit_control#(
                         o_reg_write         <= 1'b1; // escribe en rt
                         o_mem_to_reg        <= 1'b1; // read salida data memory
                         o_jump              <= 1'b0;
-                        o_byte_enable       <= 1'b1;
+                        o_byte_enable       <= 1'b1;  // BYTE
                         o_halfword_enable   <= 1'b0;
                         o_word_enable       <= 1'b0;
                         o_jr_jalr           <= 1'b0;

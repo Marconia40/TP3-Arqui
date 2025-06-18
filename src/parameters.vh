@@ -10,10 +10,10 @@
 `define LUI_OPCODE   6'h0f 
 `define LB_OPCODE    6'h20 
 `define LH_OPCODE    6'h21 
-`define LHU_OPCODE   6'h22 
+`define LHU_OPCODE   6'h25 
 `define LW_OPCODE    6'h23 
-`define LWU_OPCODE   6'h24 
-`define LBU_OPCODE   6'h25 
+`define LWU_OPCODE   6'h27 
+`define LBU_OPCODE   6'h24 
 `define SB_OPCODE    6'h28 
 `define SH_OPCODE    6'h29 
 `define SW_OPCODE    6'h2b 
